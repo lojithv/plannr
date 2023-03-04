@@ -8,9 +8,13 @@ import {
   Provider,
   defaultTheme,
   Button,
+  ActionGroup,
+  Item,
 } from "@adobe/react-spectrum";
+import Brush from "@spectrum-icons/workflow/Brush";
 import Edit from "@spectrum-icons/workflow/Edit";
 import Erase from "@spectrum-icons/workflow/Erase";
+import Hand from "@spectrum-icons/workflow/Hand";
 import { KonvaEventObject } from "konva/lib/Node";
 import React, { MouseEvent, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
@@ -35,25 +39,29 @@ const App = () => {
   // const groupRef = useRef<any>(null);
 
   const handleMouseDown = () => {
-    setIsDrawing(true);
+    if (tool === "brush" || tool === "eraser") {
+      setIsDrawing(true);
+    }
+
     const pos = layerRef.current.getRelativePointerPosition();
     setLines([...lines, { tool, points: [pos.x, pos.y] }]);
   };
 
   const handleMouseMove = () => {
-    if (!isDrawing && (tool === "pen" || tool === "eraser")) {
+    if (!isDrawing) {
       return;
     }
+    if (tool === "brush" || tool === "eraser") {
+      const point = layerRef.current.getRelativePointerPosition();
+      let lastLine = lines[lines.length - 1];
+      if (lastLine) {
+        // add point
+        lastLine.points = lastLine.points.concat([point.x, point.y]);
 
-    const point = layerRef.current.getRelativePointerPosition();
-    let lastLine = lines[lines.length - 1];
-    if (lastLine) {
-      // add point
-      lastLine.points = lastLine.points.concat([point.x, point.y]);
-
-      // replace last
-      lines.splice(lines.length - 1, 1, lastLine);
-      setLines(lines.concat());
+        // replace last
+        lines.splice(lines.length - 1, 1, lastLine);
+        setLines(lines.concat());
+      }
     }
   };
 
@@ -98,45 +106,23 @@ const App = () => {
     >
       <div style={{ position: "absolute", zIndex: 20 }}>
         <Provider theme={defaultTheme}>
-          <Flex wrap gap="size-250">
-            <View backgroundColor="static-blue-700" padding="size-50">
-              <TooltipTrigger>
-                <ActionButton
-                  aria-label="Edit Name"
-                  onPressStart={(e) => {
-                    handleToolChange("pan");
-                  }}
-                >
-                  <Edit color="positive" />
-                </ActionButton>
+          <View backgroundColor="static-blue-700" padding="size-50">
+            <ActionGroup
+              orientation="vertical"
+              onAction={(key) => handleToolChange(key.toString())}
+            >
+              <Item key="pan" aria-label="Pan">
+                <Hand color="positive" />
+              </Item>
+              <Item key="brush" aria-label="Brush">
+                <Brush color="positive" />
+              </Item>
+              <Item key="eraser" aria-label="Brush">
+                <Erase />
+              </Item>
+            </ActionGroup>
+          </View>
 
-                <Tooltip>Pen</Tooltip>
-              </TooltipTrigger>
-              <TooltipTrigger>
-                <ActionButton
-                  aria-label="Edit Name"
-                  onPressStart={(e) => {
-                    handleToolChange("pen");
-                  }}
-                >
-                  <Edit color="positive" />
-                </ActionButton>
-
-                <Tooltip>Pen</Tooltip>
-              </TooltipTrigger>
-              <TooltipTrigger>
-                <ActionButton
-                  aria-label="Edit Name"
-                  onPressStart={(e) => {
-                    handleToolChange("eraser");
-                  }}
-                >
-                  <Erase />
-                </ActionButton>
-                <Tooltip>Eraser</Tooltip>
-              </TooltipTrigger>
-            </View>
-          </Flex>
           {/* <ColorArea defaultValue="#7f0000" /> */}
         </Provider>
       </div>
@@ -151,6 +137,7 @@ const App = () => {
         scaleX={scale}
         scaleY={scale}
         className="stage"
+        draggable={tool === "pan" ? true : false}
       >
         <Layer
           ref={layerRef}
@@ -170,7 +157,7 @@ const App = () => {
               key={i}
               points={line.points}
               stroke="#df4b26"
-              strokeWidth={line.tool === "eraser" ? 20:5}
+              strokeWidth={line.tool === "eraser" ? 20 : 5}
               tension={0.5}
               lineCap="round"
               lineJoin="round"
