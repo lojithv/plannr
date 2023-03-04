@@ -3335,6 +3335,30 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@react-rxjs/core@npm:^0.10.3":
+  version: 0.10.3
+  resolution: "@react-rxjs/core@npm:0.10.3"
+  dependencies:
+    "@rx-state/core": 0.1.1
+    use-sync-external-store: ^1.0.0
+  peerDependencies:
+    react: ">=16.8.0"
+    rxjs: ">=7"
+  checksum: 769d0537227f924a1c1ad6b4cd79db940dd4a025abbda59ca188ab2bdaffcac11aeb0922c7920ea1ff3dead1460a342d4d17d9d76e25dfa63fdf39fe25939464
+  languageName: node
+  linkType: hard
+
+"@react-rxjs/utils@npm:^0.9.5":
+  version: 0.9.5
+  resolution: "@react-rxjs/utils@npm:0.9.5"
+  peerDependencies:
+    "@react-rxjs/core": ">=0.1.0"
+    react: ">=16.8.0"
+    rxjs: ">=6"
+  checksum: 3539b2038db5b7ef8d321b0550a87a2d959f1c6f8d9986978041c42174415a029e39e8c59948d072f381a2be718ca686922e5ce236636f2249ba1e0801ed8b4a
+  languageName: node
+  linkType: hard
+
 "@react-spectrum/actiongroup@npm:^3.8.0":
   version: 3.8.0
   resolution: "@react-spectrum/actiongroup@npm:3.8.0"
@@ -5531,6 +5555,15 @@ __metadata:
   version: 1.2.0
   resolution: "@rushstack/eslint-patch@npm:1.2.0"
   checksum: faa749faae0e83c26ae9eb00ad36a897ac78f3cf27da8e8ff21c00bcf7973b598d823d8f2b3957ef66079288bcf577f94df831eae2d65f3f68d8ca32f18b6aff
+  languageName: node
+  linkType: hard
+
+"@rx-state/core@npm:0.1.1":
+  version: 0.1.1
+  resolution: "@rx-state/core@npm:0.1.1"
+  peerDependencies:
+    rxjs: ">=7"
+  checksum: 1e0bffef9185e1d3cccb0127e62e987301437e2a747668c7acc04ca6429e0e155b0c62e597900176d640dcd1485b3533a98628101ae34c5c4addfbbc9fdabcda
   languageName: node
   linkType: hard
 
@@ -12789,6 +12822,8 @@ __metadata:
   resolution: "plannr@workspace:."
   dependencies:
     "@adobe/react-spectrum": ^3.25.0
+    "@react-rxjs/core": ^0.10.3
+    "@react-rxjs/utils": ^0.9.5
     "@react-spectrum/color": ^3.0.0-beta.20
     "@spectrum-icons/workflow": ^4.1.0
     "@testing-library/jest-dom": ^5.14.1
@@ -12804,6 +12839,7 @@ __metadata:
     react-dom: ^18.2.0
     react-konva: ^18.2.5
     react-scripts: 5.0.1
+    rxjs: ^7.8.0
     typescript: ^4.4.2
     web-vitals: ^2.1.0
   languageName: unknown
@@ -14482,6 +14518,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"rxjs@npm:^7.8.0":
+  version: 7.8.0
+  resolution: "rxjs@npm:7.8.0"
+  dependencies:
+    tslib: ^2.1.0
+  checksum: 61b4d4fd323c1043d8d6ceb91f24183b28bcf5def4f01ca111511d5c6b66755bc5578587fe714ef5d67cf4c9f2e26f4490d4e1d8cabf9bd5967687835e9866a2
+  languageName: node
+  linkType: hard
+
 "safe-buffer@npm:5.1.2, safe-buffer@npm:~5.1.0, safe-buffer@npm:~5.1.1":
   version: 5.1.2
   resolution: "safe-buffer@npm:5.1.2"
@@ -15529,7 +15574,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tslib@npm:^2.0.3, tslib@npm:^2.4.0":
+"tslib@npm:^2.0.3, tslib@npm:^2.1.0, tslib@npm:^2.4.0":
   version: 2.5.0
   resolution: "tslib@npm:2.5.0"
   checksum: ae3ed5f9ce29932d049908ebfdf21b3a003a85653a9a140d614da6b767a93ef94f460e52c3d787f0e4f383546981713f165037dc2274df212ea9f8a4541004e1
@@ -15778,6 +15823,15 @@ __metadata:
     querystringify: ^2.1.1
     requires-port: ^1.0.0
   checksum: fbdba6b1d83336aca2216bbdc38ba658d9cfb8fc7f665eb8b17852de638ff7d1a162c198a8e4ed66001ddbf6c9888d41e4798912c62b4fd777a31657989f7bdf
+  languageName: node
+  linkType: hard
+
+"use-sync-external-store@npm:^1.0.0":
+  version: 1.2.0
+  resolution: "use-sync-external-store@npm:1.2.0"
+  peerDependencies:
+    react: ^16.8.0 || ^17.0.0 || ^18.0.0
+  checksum: 5c639e0f8da3521d605f59ce5be9e094ca772bd44a4ce7322b055a6f58eeed8dda3c94cabd90c7a41fb6fa852210092008afe48f7038792fd47501f33299116a
   languageName: node
   linkType: hard
 

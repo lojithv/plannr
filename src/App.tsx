@@ -21,6 +21,8 @@ import { KonvaEventObject } from "konva/lib/Node";
 import React, { MouseEvent, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { Stage, Layer, Line, Rect, Circle, Group } from "react-konva";
+import { ToolStateStore } from "./store/Tools";
+import ColorPicker from "./widgets/ColorPicker";
 
 const App = () => {
   const [tool, setTool] = React.useState("pan");
@@ -38,15 +40,21 @@ const App = () => {
   const [scale, setScale] = useState(1);
   const stageRef = useRef<any>(null);
   const layerRef = useRef<any>(null);
+
+  const [color, setColor] = useState<string>("");
+
   // const groupRef = useRef<any>(null);
+
+  ToolStateStore.colorChange$?.subscribe((c) => {
+    setColor(c);
+  });
 
   const handleMouseDown = () => {
     if (tool === "brush" || tool === "eraser") {
       setIsDrawing(true);
     }
-
     const pos = layerRef.current.getRelativePointerPosition();
-    setLines([...lines, { tool, points: [pos.x, pos.y] }]);
+    setLines([...lines, { tool, points: [pos.x, pos.y], color: color }]);
   };
 
   const handleMouseMove = () => {
@@ -133,8 +141,10 @@ const App = () => {
           </View>
 
           {/* <ColorArea defaultValue="#7f0000" /> */}
+          <ColorPicker />
         </Provider>
       </div>
+
       <Stage
         width={window.innerWidth}
         height={window.innerHeight}
@@ -165,7 +175,7 @@ const App = () => {
             <Line
               key={i}
               points={line.points}
-              stroke="#df4b26"
+              stroke={line.color}
               strokeWidth={line.tool === "eraser" ? 20 : 5}
               tension={0.5}
               lineCap="round"
