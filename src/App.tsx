@@ -12,125 +12,160 @@ import {
 import Edit from "@spectrum-icons/workflow/Edit";
 import Erase from "@spectrum-icons/workflow/Erase";
 import { KonvaEventObject } from "konva/lib/Node";
-import React, { MouseEvent } from "react";
+import React, { MouseEvent, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
-import { Stage, Layer, Line, Text } from "react-konva";
+import { Stage, Layer, Line, Text, Rect, Circle, Group } from "react-konva";
 
 const App = () => {
   const [tool, setTool] = React.useState("pen");
-  const [lines, setLines] = React.useState<any[]>([]);
-  const isDrawing = React.useRef(false);
-  console.log(tool)
+  const [position, setPosition] = useState({ x: 0, y: 0 });
 
-  const handleMouseDown = (e: any) => {
-    isDrawing.current = true;
-    const pos = e.target.getStage().getPointerPosition();
-    setLines([...lines, { tool, points: [pos.x, pos.y] }]);
+  const [circles, setCircles] = useState<any[]>([]);
+  const [isDrawing, setIsDrawing] = useState(false);
+
+  const handleToolChange = (toolName: string) => {
+    console.log(toolName);
+    if (toolName === "pan") {
+      setIsDrawing(false);
+    }
+    setTool(toolName);
   };
 
-  const handleMouseMove = (e: KonvaEventObject<globalThis.MouseEvent>) => {
-    // no drawing - skipping
-    if (!isDrawing.current) {
+  const [lines, setLines] = useState<any[]>([]);
+  const [scale, setScale] = useState(1);
+  const stageRef = useRef<any>(null);
+  const layerRef = useRef<any>(null);
+  const groupRef = useRef<any>(null);
+
+  const handleMouseDown = () => {
+    setIsDrawing(true);
+    setLines([...lines, []]);
+  };
+
+  const handleMouseMove = () => {
+    if (!isDrawing) {
       return;
     }
-    const stage = e.target.getStage();
-    const point = stage?.getPointerPosition();
-    let lastLine = lines[lines.length - 1];
-    // add point
-    lastLine.points = lastLine.points.concat([point?.x, point?.y]);
 
-    // replace last
-    lines.splice(lines.length - 1, 1, lastLine);
-    setLines(lines.concat());
+    const point = layerRef.current.getRelativePointerPosition();
+    let lastLine = lines[lines.length - 1];
+    lastLine = lastLine.concat([point.x, point.y]);
+
+    setLines([...lines.slice(0, lines.length - 1), lastLine]);
   };
 
   const handleMouseUp = () => {
-    isDrawing.current = false;
+    setIsDrawing(false);
   };
 
-  const handleToolChange = (toolName:string) => {
-    console.log(toolName)
-    setTool(toolName)
-  }
+  const handleWheel = (e: KonvaEventObject<WheelEvent>) => {
+    e.evt.preventDefault();
 
-  let [count, setCount] = React.useState(0);
+    const stage = stageRef.current;
+    const oldScale = scale;
+    const pointer = stage.getPointerPosition();
+
+    let zoomAmount = e.evt.deltaY > 0 ? 1.1 : 1 / 1.1;
+    let newScale = oldScale * zoomAmount;
+
+    setScale(newScale);
+
+    const mousePointTo = {
+      x: (pointer.x - stage.x()) / oldScale,
+      y: (pointer.y - stage.y()) / oldScale,
+    };
+
+    const newZoom = {
+      x: pointer.x - mousePointTo.x * newScale,
+      y: pointer.y - mousePointTo.y * newScale,
+    };
+
+    stage.scale({ x: newScale, y: newScale });
+    stage.position(newZoom);
+    stage.batchDraw();
+  };
 
   return (
     <div
       style={{
-        // display: "flex",
-        // alignItems: "center",
-        // justifyContent: "center",
         height: "100vh",
+        display: "flex",
+        backgroundColor: "black",
       }}
-    > 
-    <div style={{position:'absolute',zIndex:20}}>
-         <Provider theme={defaultTheme}>
-      {/* <select
-        value={tool}
-        style={{ color: "black" }}
-        onChange={(e) => {
-          setTool(e.target.value);
-        }}
-      >
-        <option value="pen">Pen</option>
-        <option value="eraser">Eraser</option>
-      </select> */}
-      {/* <View
-        borderWidth="thin"
-        borderColor="dark"
-        borderRadius="medium"
-        // padding="size-250"
-        height="size-100"
-      > */}
-   
-        
-        <TooltipTrigger>
-          <ActionButton aria-label="Edit Name"     onPressStart={(e) => {handleToolChange('pen')}}>
-            <Edit color="positive" />
-          </ActionButton>
+    >
+      <div style={{ position: "absolute", zIndex: 20 }}>
+        <Provider theme={defaultTheme}>
+          <Flex wrap gap="size-250">
+            <View backgroundColor="static-blue-700" padding="size-50">
+              <TooltipTrigger>
+                <ActionButton
+                  aria-label="Edit Name"
+                  onPressStart={(e) => {
+                    handleToolChange("pan");
+                  }}
+                >
+                  <Edit color="positive" />
+                </ActionButton>
 
-          <Tooltip>Pen</Tooltip>
-        </TooltipTrigger>
-        <TooltipTrigger>
-          <ActionButton
-            aria-label="Edit Name"
-            onPressStart={(e) => {handleToolChange('eraser')}}
-          >
-            <Erase />
-          </ActionButton>
-          <Tooltip>Eraser</Tooltip>
-        </TooltipTrigger>
-      </Provider>
- 
+                <Tooltip>Pen</Tooltip>
+              </TooltipTrigger>
+              <TooltipTrigger>
+                <ActionButton
+                  aria-label="Edit Name"
+                  onPressStart={(e) => {
+                    handleToolChange("pen");
+                  }}
+                >
+                  <Edit color="positive" />
+                </ActionButton>
 
+                <Tooltip>Pen</Tooltip>
+              </TooltipTrigger>
+              <TooltipTrigger>
+                <ActionButton
+                  aria-label="Edit Name"
+                  onPressStart={(e) => {
+                    handleToolChange("eraser");
+                  }}
+                >
+                  <Erase />
+                </ActionButton>
+                <Tooltip>Eraser</Tooltip>
+              </TooltipTrigger>
+            </View>
+          </Flex>
+          {/* <ColorArea defaultValue="#7f0000" /> */}
+        </Provider>
       </div>
-      {/* <ColorArea defaultValue="#7f0000" /> */}
-      {/* </View> */}
       <Stage
+      width={window.innerWidth}
+      height={window.innerHeight}
+      onMouseDown={handleMouseDown}
+      onMousemove={handleMouseMove}
+      onMouseup={handleMouseUp}
+      onWheel={handleWheel}
+      ref={stageRef}
+      scaleX={scale}
+      scaleY={scale}
+    >
+      <Layer
+        ref={layerRef}
         width={window.innerWidth}
         height={window.innerHeight}
-        onMouseDown={handleMouseDown}
-        onMousemove={handleMouseMove}
-        onMouseup={handleMouseUp}
       >
-        <Layer>
+          <Rect
+            x={50}
+            y={50}
+            width={100}
+            height={100}
+            fill="red"
+            draggable={true}
+          />
           {lines.map((line, i) => (
-            <Line
-              key={i}
-              points={line.points}
-              stroke="#df4b26"
-              strokeWidth={5}
-              tension={0.5}
-              lineCap="round"
-              lineJoin="round"
-              globalCompositeOperation={
-                line.tool === "eraser" ? "destination-out" : "source-over"
-              }
-            />
+            <Line key={i} points={line} stroke="red" strokeWidth={5} />
           ))}
-        </Layer>
-      </Stage>
+      </Layer>
+    </Stage>
     </div>
   );
 };
