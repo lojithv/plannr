@@ -10,18 +10,20 @@ import {
   Button,
   ActionGroup,
   Item,
+  Text,
 } from "@adobe/react-spectrum";
 import Brush from "@spectrum-icons/workflow/Brush";
 import Edit from "@spectrum-icons/workflow/Edit";
 import Erase from "@spectrum-icons/workflow/Erase";
 import Hand from "@spectrum-icons/workflow/Hand";
+import Move from "@spectrum-icons/workflow/Move";
 import { KonvaEventObject } from "konva/lib/Node";
 import React, { MouseEvent, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
-import { Stage, Layer, Line, Text, Rect, Circle, Group } from "react-konva";
+import { Stage, Layer, Line, Rect, Circle, Group } from "react-konva";
 
 const App = () => {
-  const [tool, setTool] = React.useState("pen");
+  const [tool, setTool] = React.useState("pan");
   const [isDrawing, setIsDrawing] = useState(false);
 
   const handleToolChange = (toolName: string) => {
@@ -106,19 +108,26 @@ const App = () => {
     >
       <div style={{ position: "absolute", zIndex: 20 }}>
         <Provider theme={defaultTheme}>
-          <View backgroundColor="static-blue-700" padding="size-50">
+          <View backgroundColor="gray-50" padding="size-50">
             <ActionGroup
               orientation="vertical"
+              isEmphasized
+              selectionMode="single"
               onAction={(key) => handleToolChange(key.toString())}
+              selectedKeys={[tool]}
+              buttonLabelBehavior="hide"
             >
-              <Item key="pan" aria-label="Pan">
-                <Hand color="positive" />
+              <Item key="pan">
+                <Hand />
+                <Text>Pan</Text>
               </Item>
               <Item key="brush" aria-label="Brush">
-                <Brush color="positive" />
+                <Brush />
+                <Text>Brush</Text>
               </Item>
               <Item key="eraser" aria-label="Brush">
                 <Erase />
+                <Text>Eraser</Text>
               </Item>
             </ActionGroup>
           </View>
