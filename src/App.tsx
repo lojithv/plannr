@@ -18,9 +18,6 @@ import { Stage, Layer, Line, Text, Rect, Circle, Group } from "react-konva";
 
 const App = () => {
   const [tool, setTool] = React.useState("pen");
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-
-  const [circles, setCircles] = useState<any[]>([]);
   const [isDrawing, setIsDrawing] = useState(false);
 
   const handleToolChange = (toolName: string) => {
@@ -35,23 +32,29 @@ const App = () => {
   const [scale, setScale] = useState(1);
   const stageRef = useRef<any>(null);
   const layerRef = useRef<any>(null);
-  const groupRef = useRef<any>(null);
+  // const groupRef = useRef<any>(null);
 
   const handleMouseDown = () => {
     setIsDrawing(true);
-    setLines([...lines, []]);
+    const pos = layerRef.current.getRelativePointerPosition();
+    setLines([...lines, { tool, points: [pos.x, pos.y] }]);
   };
 
   const handleMouseMove = () => {
-    if (!isDrawing) {
+    if (!isDrawing && (tool === "pen" || tool === "eraser")) {
       return;
     }
 
     const point = layerRef.current.getRelativePointerPosition();
     let lastLine = lines[lines.length - 1];
-    lastLine = lastLine.concat([point.x, point.y]);
+    if (lastLine) {
+      // add point
+      lastLine.points = lastLine.points.concat([point.x, point.y]);
 
-    setLines([...lines.slice(0, lines.length - 1), lastLine]);
+      // replace last
+      lines.splice(lines.length - 1, 1, lastLine);
+      setLines(lines.concat());
+    }
   };
 
   const handleMouseUp = () => {
@@ -138,21 +141,22 @@ const App = () => {
         </Provider>
       </div>
       <Stage
-      width={window.innerWidth}
-      height={window.innerHeight}
-      onMouseDown={handleMouseDown}
-      onMousemove={handleMouseMove}
-      onMouseup={handleMouseUp}
-      onWheel={handleWheel}
-      ref={stageRef}
-      scaleX={scale}
-      scaleY={scale}
-    >
-      <Layer
-        ref={layerRef}
         width={window.innerWidth}
         height={window.innerHeight}
+        onMouseDown={handleMouseDown}
+        onMousemove={handleMouseMove}
+        onMouseup={handleMouseUp}
+        onWheel={handleWheel}
+        ref={stageRef}
+        scaleX={scale}
+        scaleY={scale}
+        className="stage"
       >
+        <Layer
+          ref={layerRef}
+          width={window.innerWidth}
+          height={window.innerHeight}
+        >
           <Rect
             x={50}
             y={50}
@@ -162,10 +166,21 @@ const App = () => {
             draggable={true}
           />
           {lines.map((line, i) => (
-            <Line key={i} points={line} stroke="red" strokeWidth={5} />
+            <Line
+              key={i}
+              points={line.points}
+              stroke="#df4b26"
+              strokeWidth={line.tool === "eraser" ? 20:5}
+              tension={0.5}
+              lineCap="round"
+              lineJoin="round"
+              globalCompositeOperation={
+                line.tool === "eraser" ? "destination-out" : "source-over"
+              }
+            />
           ))}
-      </Layer>
-    </Stage>
+        </Layer>
+      </Stage>
     </div>
   );
 };
