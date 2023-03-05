@@ -161,12 +161,6 @@ const App = () => {
         </Provider>
       </div>
 
-      <div style={{ position: "absolute", zIndex: 20, bottom: "0px" }}>
-        <Provider theme={defaultTheme}>
-          <ColorPicker />
-        </Provider>
-      </div>
-
       <Stage
         width={window.innerWidth}
         height={window.innerHeight}
