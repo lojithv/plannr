@@ -132,27 +132,31 @@ const App = () => {
       <div style={{ position: "absolute", zIndex: 20, top: "50px" }}>
         <Provider theme={defaultTheme}>
           <View backgroundColor="gray-50" padding="size-50">
-            <ActionGroup
-              orientation="vertical"
-              isEmphasized
-              selectionMode="single"
-              onAction={(key) => handleToolChange(key.toString())}
-              selectedKeys={[tool]}
-              buttonLabelBehavior="hide"
-            >
-              <Item key="pan">
-                <Hand />
-                <Text>Pan</Text>
-              </Item>
-              <Item key="brush" aria-label="Brush">
-                <Brush />
-                <Text>Brush</Text>
-              </Item>
-              <Item key="eraser" aria-label="Brush">
-                <Erase />
-                <Text>Eraser</Text>
-              </Item>
-            </ActionGroup>
+            <Flex direction={"column"} gap={"size-100"}>
+              <ActionGroup
+                orientation="vertical"
+                isEmphasized
+                selectionMode="single"
+                onAction={(key) => handleToolChange(key.toString())}
+                selectedKeys={[tool]}
+                buttonLabelBehavior="hide"
+              >
+                <Item key="pan">
+                  <Hand />
+                  <Text>Pan</Text>
+                </Item>
+                <Item key="brush" aria-label="Brush">
+                  <Brush />
+                  <Text>Brush</Text>
+                </Item>
+                <Item key="eraser" aria-label="Brush">
+                  <Erase />
+                  <Text>Eraser</Text>
+                </Item>
+              </ActionGroup>
+
+              <ColorPicker />
+            </Flex>
           </View>
         </Provider>
       </div>
