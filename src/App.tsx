@@ -11,6 +11,8 @@ import {
   ActionGroup,
   Item,
   Text,
+  Header,
+  Divider,
 } from "@adobe/react-spectrum";
 import Brush from "@spectrum-icons/workflow/Brush";
 import Edit from "@spectrum-icons/workflow/Edit";
@@ -114,7 +116,20 @@ const App = () => {
         backgroundColor: "black",
       }}
     >
-      <div style={{ position: "absolute", zIndex: 20 }}>
+      <div
+        style={{
+          position: "absolute",
+          zIndex: 20,
+          width: "100%",
+          height: "50px",
+        }}
+      >
+        <Provider theme={defaultTheme}>
+          <Header height={"calc(50px)"}>Header</Header>
+        </Provider>
+      </div>
+
+      <div style={{ position: "absolute", zIndex: 20, top: "50px" }}>
         <Provider theme={defaultTheme}>
           <View backgroundColor="gray-50" padding="size-50">
             <ActionGroup
@@ -139,8 +154,11 @@ const App = () => {
               </Item>
             </ActionGroup>
           </View>
+        </Provider>
+      </div>
 
-          {/* <ColorArea defaultValue="#7f0000" /> */}
+      <div style={{ position: "absolute", zIndex: 20, bottom: "0px" }}>
+        <Provider theme={defaultTheme}>
           <ColorPicker />
         </Provider>
       </div>
