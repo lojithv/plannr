@@ -8,19 +8,26 @@ import {
   Provider,
   defaultTheme,
   Button,
+  ActionGroup,
+  Item,
+  Text,
+  Header,
+  Divider,
 } from "@adobe/react-spectrum";
+import Brush from "@spectrum-icons/workflow/Brush";
 import Edit from "@spectrum-icons/workflow/Edit";
 import Erase from "@spectrum-icons/workflow/Erase";
+import Hand from "@spectrum-icons/workflow/Hand";
+import Move from "@spectrum-icons/workflow/Move";
 import { KonvaEventObject } from "konva/lib/Node";
 import React, { MouseEvent, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
-import { Stage, Layer, Line, Text, Rect, Circle, Group } from "react-konva";
+import { Stage, Layer, Line, Rect, Circle, Group } from "react-konva";
+import { ToolStateStore } from "./store/Tools";
+import ColorPicker from "./widgets/ColorPicker";
 
 const App = () => {
-  const [tool, setTool] = React.useState("pen");
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-
-  const [circles, setCircles] = useState<any[]>([]);
+  const [tool, setTool] = React.useState("pan");
   const [isDrawing, setIsDrawing] = useState(false);
 
   const handleToolChange = (toolName: string) => {
@@ -35,23 +42,39 @@ const App = () => {
   const [scale, setScale] = useState(1);
   const stageRef = useRef<any>(null);
   const layerRef = useRef<any>(null);
-  const groupRef = useRef<any>(null);
+
+  const [color, setColor] = useState<string>("");
+
+  // const groupRef = useRef<any>(null);
+
+  ToolStateStore.colorChange$?.subscribe((c) => {
+    setColor(c);
+  });
 
   const handleMouseDown = () => {
-    setIsDrawing(true);
-    setLines([...lines, []]);
+    if (tool === "brush" || tool === "eraser") {
+      setIsDrawing(true);
+    }
+    const pos = layerRef.current.getRelativePointerPosition();
+    setLines([...lines, { tool, points: [pos.x, pos.y], color: color }]);
   };
 
   const handleMouseMove = () => {
     if (!isDrawing) {
       return;
     }
+    if (tool === "brush" || tool === "eraser") {
+      const point = layerRef.current.getRelativePointerPosition();
+      let lastLine = lines[lines.length - 1];
+      if (lastLine) {
+        // add point
+        lastLine.points = lastLine.points.concat([point.x, point.y]);
 
-    const point = layerRef.current.getRelativePointerPosition();
-    let lastLine = lines[lines.length - 1];
-    lastLine = lastLine.concat([point.x, point.y]);
-
-    setLines([...lines.slice(0, lines.length - 1), lastLine]);
+        // replace last
+        lines.splice(lines.length - 1, 1, lastLine);
+        setLines(lines.concat());
+      }
+    }
   };
 
   const handleMouseUp = () => {
@@ -93,66 +116,69 @@ const App = () => {
         backgroundColor: "black",
       }}
     >
-      <div style={{ position: "absolute", zIndex: 20 }}>
+      <div
+        style={{
+          position: "absolute",
+          zIndex: 20,
+          width: "100%",
+          height: "50px",
+        }}
+      >
         <Provider theme={defaultTheme}>
-          <Flex wrap gap="size-250">
-            <View backgroundColor="static-blue-700" padding="size-50">
-              <TooltipTrigger>
-                <ActionButton
-                  aria-label="Edit Name"
-                  onPressStart={(e) => {
-                    handleToolChange("pan");
-                  }}
-                >
-                  <Edit color="positive" />
-                </ActionButton>
-
-                <Tooltip>Pen</Tooltip>
-              </TooltipTrigger>
-              <TooltipTrigger>
-                <ActionButton
-                  aria-label="Edit Name"
-                  onPressStart={(e) => {
-                    handleToolChange("pen");
-                  }}
-                >
-                  <Edit color="positive" />
-                </ActionButton>
-
-                <Tooltip>Pen</Tooltip>
-              </TooltipTrigger>
-              <TooltipTrigger>
-                <ActionButton
-                  aria-label="Edit Name"
-                  onPressStart={(e) => {
-                    handleToolChange("eraser");
-                  }}
-                >
-                  <Erase />
-                </ActionButton>
-                <Tooltip>Eraser</Tooltip>
-              </TooltipTrigger>
-            </View>
-          </Flex>
-          {/* <ColorArea defaultValue="#7f0000" /> */}
+          <Header height={"calc(50px)"}>Header</Header>
         </Provider>
       </div>
+
+      <div style={{ position: "absolute", zIndex: 20, top: "50px" }}>
+        <Provider theme={defaultTheme}>
+          <View backgroundColor="gray-50" padding="size-50">
+            <Flex direction={"column"} gap={"size-100"}>
+              <ActionGroup
+                orientation="vertical"
+                isEmphasized
+                selectionMode="single"
+                onAction={(key) => handleToolChange(key.toString())}
+                selectedKeys={[tool]}
+                buttonLabelBehavior="hide"
+              >
+                <Item key="pan">
+                  <Hand />
+                  <Text>Pan</Text>
+                </Item>
+                <Item key="brush" aria-label="Brush">
+                  <Brush />
+                  <Text>Brush</Text>
+                </Item>
+                <Item key="eraser" aria-label="Brush">
+                  <Erase />
+                  <Text>Eraser</Text>
+                </Item>
+              </ActionGroup>
+
+              <ColorPicker />
+            </Flex>
+          </View>
+        </Provider>
+      </div>
+
       <Stage
-      width={window.innerWidth}
-      height={window.innerHeight}
-      onMouseDown={handleMouseDown}
-      onMousemove={handleMouseMove}
-      onMouseup={handleMouseUp}
-      onWheel={handleWheel}
-      ref={stageRef}
-      scaleX={scale}
-      scaleY={scale}
-    >
-      <Layer
-        ref={layerRef}
         width={window.innerWidth}
         height={window.innerHeight}
+        onMouseDown={handleMouseDown}
+        onMousemove={handleMouseMove}
+        onMouseup={handleMouseUp}
+        onWheel={handleWheel}
+        ref={stageRef}
+        scaleX={scale}
+        scaleY={scale}
+        className="stage"
+        draggable={tool === "pan" ? true : false}
       >
+        <Layer
+          ref={layerRef}
+          width={window.innerWidth}
+          height={window.innerHeight}
+        >
           <Rect
             x={50}
             y={50}
@@ -162,10 +188,21 @@ const App = () => {
             draggable={true}
           />
           {lines.map((line, i) => (
-            <Line key={i} points={line} stroke="red" strokeWidth={5} />
+            <Line
+              key={i}
+              points={line.points}
+              stroke={line.color}
+              strokeWidth={line.tool === "eraser" ? 20 : 5}
+              tension={0.5}
+              lineCap="round"
+              lineJoin="round"
+              globalCompositeOperation={
+                line.tool === "eraser" ? "destination-out" : "source-over"
+              }
+            />
           ))}
-      </Layer>
-    </Stage>
+        </Layer>
+      </Stage>
     </div>
   );
 };
