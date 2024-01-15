@@ -20,10 +20,10 @@ import {
 import { PressEvent } from "@react-types/shared";
 
 function ColorPicker() {
-  let [color, setColor] = React.useState(parseColor("#ff00ff"));
+  let [color, setColor] = React.useState(parseColor("#000000"));
   let [redChannel, greenChannel, blueChannel] = color.getColorChannels();
 
-  const [stateColor, setStateColor] = useState("#ff00ff");
+  const [stateColor, setStateColor] = useState("#000000");
 
   useEffect(() => {
     ToolStateStore.setColor(color.toString("css"));
@@ -40,14 +40,14 @@ function ColorPicker() {
   return (
     <DialogTrigger>
       <ActionButton>
-          <div
-            style={{
-              width: "100%",
-              height: "100%",
-              backgroundColor: stateColor,
-              borderRadius:'3px'
-            }}
-          ></div>
+        <div
+          style={{
+            width: "100%",
+            height: "100%",
+            backgroundColor: stateColor,
+            borderRadius: '3px'
+          }}
+        ></div>
       </ActionButton>
       {(close) => (
         <Dialog size="S">
@@ -63,19 +63,19 @@ function ColorPicker() {
                   yChannel={greenChannel}
                   value={color}
                   onChange={setColor}
-                  // onChangeEnd={handleColorChangeEnd}
+                // onChangeEnd={handleColorChangeEnd}
                 />
                 <ColorSlider
                   channel={blueChannel}
                   value={color}
                   onChange={setColor}
-                  // onChangeEnd={handleColorChangeEnd}
+                // onChangeEnd={handleColorChangeEnd}
                 />
                 <ColorSlider
                   channel="alpha"
                   value={color}
                   onChange={setColor}
-                  // onChangeEnd={handleColorChangeEnd}
+                // onChangeEnd={handleColorChangeEnd}
                 />
                 <p>Current value: {color.toString("css")}</p>
               </Flex>
