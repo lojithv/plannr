@@ -25,6 +25,7 @@ import { createRoot } from "react-dom/client";
 import { Stage, Layer, Line, Rect, Circle, Group } from "react-konva";
 import { ToolStateStore } from "./store/Tools";
 import ColorPicker from "./widgets/ColorPicker";
+import Navbar from "./components/Navbar";
 
 const App = () => {
   const [tool, setTool] = React.useState("pan");
@@ -110,23 +111,12 @@ const App = () => {
 
   return (
     <div
-      style={{
-        height: "100vh",
-        display: "flex",
-        backgroundColor: "black",
-      }}
+      className="w-screen h-screen relative "
     >
       <div
-        style={{
-          position: "absolute",
-          zIndex: 20,
-          width: "100%",
-          height: "50px",
-        }}
+        className="h-[50px] absolute w-full"
       >
-        <Provider theme={defaultTheme}>
-          <Header height={"calc(50px)"}>Header</Header>
-        </Provider>
+        <Navbar />
       </div>
 
       <div style={{ position: "absolute", zIndex: 20, top: "50px" }}>
@@ -137,7 +127,7 @@ const App = () => {
                 orientation="vertical"
                 isEmphasized
                 selectionMode="single"
-                onAction={(key) => handleToolChange(key.toString())}
+                onAction={(key: any) => handleToolChange(key.toString())}
                 selectedKeys={[tool]}
                 buttonLabelBehavior="hide"
               >
